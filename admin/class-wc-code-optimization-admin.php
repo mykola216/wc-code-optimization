@@ -208,7 +208,7 @@ class Wc_Code_Optimization_Admin
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/' . $cachedPage;
-        var_dump($cachedPageURL);
+        //var_dump($cachedPageURL);
         return file_get_contents($cachedPageURL);
     }
 
@@ -218,7 +218,7 @@ class Wc_Code_Optimization_Admin
 
         preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
         $cssLinks_arr = !empty($exclude_css_link) ? array_diff($cssLinks[1], $exclude_css_link) : $cssLinks[1];
-        var_dump($cssLinks_arr);
+        //var_dump($cssLinks_arr);
         return $cssLinks_arr;
     }
 
@@ -371,6 +371,7 @@ class Wc_Code_Optimization_Admin
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
             file_put_contents($rebuildCachedPageGzFile, $gzipContent);
 
+           // echo 'Відповідь від сервера: ' . $cleaned_css;
             echo 'Відповідь від сервера: ' . $cleaned_css;
         }
 

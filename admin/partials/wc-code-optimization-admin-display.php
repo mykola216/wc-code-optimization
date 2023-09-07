@@ -156,6 +156,28 @@
         submit_button();
         ?>
     </form>
+
+
+    <?php
+
+    $color_text = 'site_url';
+    if (!empty($options[$color_text])) {
+        $domain = $options[$color_text];
+        $cachedPageURL = ABSPATH . 'wp-content/cache/supercache/' . $domain . '/';
+        $mydir = $cachedPageURL;
+
+        $myfiles = array_diff(scandir($mydir), array('.', '..'));
+
+        foreach ($myfiles as $filename) {
+            echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
+        }
+    }
+    ?>
+
+
+
+
+
     <br>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
     <select name="select_page" id="select_page">
@@ -203,21 +225,7 @@ $selected_css = get_option('selected_css');
     <!-- <button class="button button-primary" id="saveButton">Generate optimized css code</button> -->
 
 
-<?php
 
-$color_text = 'site_url';
-if (!empty($options[$color_text])) {
-    $domain = $options[$color_text];
-    $cachedPageURL = ABSPATH . 'wp-content/cache/supercache/' . $domain . '/';
-    $mydir = $cachedPageURL;
-
-    $myfiles = array_diff(scandir($mydir), array('.', '..'));
-
-    foreach ($myfiles as $filename) {
-        echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
-    }
-}
-?>
 
 
 

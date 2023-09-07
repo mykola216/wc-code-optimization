@@ -62,7 +62,7 @@
 					action: 'wc_optimized_css_action',
 					selectedCss: selectedCss,
 					css_url: cssUrl,
-					optimizedPage, optimizedPage
+					optimizedPage: optimizedPage
 				},
 				success: function (data) {
 					console.log('Result: ' + data);
