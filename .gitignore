@@ -4,4 +4,3 @@
 .htaccess
 .git-credentials
 *.pot~
-rebuilt-cached-page/*
