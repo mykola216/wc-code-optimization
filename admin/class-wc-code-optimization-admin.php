@@ -208,7 +208,7 @@ class Wc_Code_Optimization_Admin
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/' . $cachedPage;
-        //var_dump($cachedPageURL);
+        var_dump($cachedPageURL);
         return file_get_contents($cachedPageURL);
     }
 
@@ -371,8 +371,7 @@ class Wc_Code_Optimization_Admin
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
             file_put_contents($rebuildCachedPageGzFile, $gzipContent);
 
-           // echo 'Відповідь від сервера: ' . $cleaned_css;
-            echo 'Відповідь від сервера: ' . $cleaned_css;
+            //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
 
 
