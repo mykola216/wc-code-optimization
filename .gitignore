@@ -1,0 +1,7 @@
+*.sql
+*.tar.gz
+.idea/
+.htaccess
+.git-credentials
+*.pot~
+rebuilt-cached-page/*
