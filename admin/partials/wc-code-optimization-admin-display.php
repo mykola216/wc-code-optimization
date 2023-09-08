@@ -198,7 +198,7 @@
     <br>
 <?php
 $domain = parse_url(home_url(), PHP_URL_HOST);
-$cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/index.html';
+$cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/index-webp.html';
 $htmlContent = file_get_contents($cachedPageURL);
 preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
 $selected_css = get_option('selected_css');

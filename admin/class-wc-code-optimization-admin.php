@@ -178,13 +178,19 @@ class Wc_Code_Optimization_Admin
         return $valid;
     }
 
-    private function get_protocol_and_uri () {
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {$url = "https://";}else{$url = "http://";}
-        $url.= $_SERVER['HTTP_HOST'];
+    private function get_protocol_and_uri()
+    {
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            $url = "https://";
+        } else {
+            $url = "http://";
+        }
+        $url .= $_SERVER['HTTP_HOST'];
         return $url;
     }
 
-    private function get_setings_admin ($name) {
+    private function get_setings_admin($name)
+    {
         $option_filds = 'tabs_one';
         $options = get_option($option_filds . '_option');
         return $options[$name];
@@ -200,7 +206,7 @@ class Wc_Code_Optimization_Admin
         $targetFolder = $this->getTargetFolder();
         $combinedCSSFile = $targetFolder . 'combined-css.css';
         $this->saveCombinedCSSToFile($combinedCSS, $combinedCSSFile);
-        $cachedPageContent = $this->removeStyleTags($cachedPageContent);
+        $cachedPageContent = isset($_POST['css_url']) ? $this->removeStyleTags($cachedPageContent, $_POST['css_url']) : $this->removeStyleTags($cachedPageContent, array());
         $rebuildCachedPageFile = $targetFolder . 'rebuild-index.html';
         $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile);
         $this->createGzipVersion($cachedPageContent, $rebuildCachedPageFile);
@@ -213,7 +219,7 @@ class Wc_Code_Optimization_Admin
 
     private function getCachedPageContent($cachedPage)
     {
-        $cachedPageURL = ABSPATH . $this->get_setings_admin ('plugins_url') . $cachedPage;
+        $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url') . $cachedPage;
         if (file_get_contents($cachedPageURL)) {
             return file_get_contents($cachedPageURL);
         } else {
@@ -244,9 +250,13 @@ class Wc_Code_Optimization_Admin
 
     private function getTargetFolder()
     {
-        if (!file_exists(ABSPATH.$this->get_setings_admin ('cache_url'))) {
-            mkdir(ABSPATH.$this->get_setings_admin ('cache_url'), 0755, true);
-            return ABSPATH.$this->get_setings_admin ('cache_url');
+        $currentFilePath = __FILE__;
+        $rootPath = dirname(dirname($currentFilePath));
+        return $rootPath . '/rebuilt-cached-page/';
+        if (!file_exists(ABSPATH . $this->get_setings_admin('cache_url'))) {
+            mkdir(ABSPATH . $this->get_setings_admin('cache_url'), 0755, true);
+           
+            return ABSPATH . $this->get_setings_admin('cache_url');
         } else {
             return 'ERROR dir getTargetFolder';
         }
@@ -257,17 +267,32 @@ class Wc_Code_Optimization_Admin
         file_put_contents($combinedCSSFile, $combinedCSS);
     }
 
-    private function removeStyleTags($htmlContent)
+    private function removeStyleTags($htmlContent, $allowedStyles)
     {
-        $htmlContent = preg_replace('/<link[^>]*stylesheet.*?>/i', '', $htmlContent);
+        // Перевіряємо, чи містить URL стилів у масиві $allowedStyles
+        $htmlContent = preg_replace_callback('/<link[^>]*href=["\'](.*?)["\'].*?>/i', function ($match) use ($allowedStyles) {
+            $url = $match[1];
+            if (in_array($url, $allowedStyles)) {
+                return $match[0]; // Залишаємо тег <link>, оскільки URL є у списку дозволених стилів
+            } else {
+                return ''; // Видаляємо тег <link>, оскільки URL не є у списку дозволених стилів
+            }
+        }, $htmlContent);
+
+        // Видаляємо теги <style>
         $htmlContent = preg_replace('/<style[^>]*>(?:(?:(?!<\/style>)(?!<\/style>).)*?)<\/style>/is', '', $htmlContent);
+
+        // Прибираємо зайві пробіли
         $htmlContent = preg_replace('/^\s+$/m', '', $htmlContent);
+        
         return $htmlContent;
     }
 
+
+
     private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile)
     {
-        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="'.$this->get_setings_admin ('cache_url') . basename($combinedCSSFile) . '">';
+        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '">';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
         file_put_contents($rebuildCachedPageFile, $htmlContent);
         isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage']) : '';
@@ -292,14 +317,14 @@ class Wc_Code_Optimization_Admin
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $jsonData = json_encode(array(
-            'id' => $this->get_setings_admin ('id_opt'),
+            'id' => $this->get_setings_admin('id_opt'),
             'site_url' => 'sht.nik',
             "page_send_cov" => "home_desctop",
-            "site_url_page" => $this->get_protocol_and_uri() .$this->get_setings_admin ('cache_url')."rebuild-index.html",
-            "secret_key" => $this->get_setings_admin ('secret_key')
+            "site_url_page" => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . "rebuild-index.html",
+            "secret_key" => $this->get_setings_admin('secret_key')
         ));
 
-        $ch = curl_init($this->get_setings_admin ('api_url'));
+        $ch = curl_init($this->get_setings_admin('api_url'));
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -342,15 +367,15 @@ class Wc_Code_Optimization_Admin
 
             $cleaned_css = preg_replace($patterns, '', $cssCode);
             // Замініть підключений CSS на test2.css в HTML
-            
-            $cachedPageURL = ABSPATH . $this->get_setings_admin ('cache_url').'rebuild-index.html';
+
+            $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . 'rebuild-index.html';
             $htmlContent = file_get_contents($cachedPageURL);
 
 
-            $htmlContent = str_replace($this->get_setings_admin ('cache_url').'combined-css.css', $this->get_setings_admin ('plugins_url'). 'test2.css', $htmlContent);
+            $htmlContent = str_replace($this->get_setings_admin('cache_url') . 'combined-css.css', $this->get_setings_admin('plugins_url') . 'test2.css', $htmlContent);
 
             $domain = parse_url(home_url(), PHP_URL_HOST);
-            $cachedPageURL = ABSPATH . $this->get_setings_admin ('plugins_url');
+            $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
 
             // Збережіть CSS у test2.css
             $output_css = $cachedPageURL . 'test2.css';
@@ -358,9 +383,9 @@ class Wc_Code_Optimization_Admin
 
             // Збережіть змінений HTML у rebuild-index-webp.html
             $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
-            
+
             // rename file
-            rename($rebuildCachedPageFile,$cachedPageURL . 'old_' . $cachedPage);
+            rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
 
             // create file new
             file_put_contents($rebuildCachedPageFile, $htmlContent, FILE_APPEND | LOCK_EX);
@@ -379,7 +404,8 @@ class Wc_Code_Optimization_Admin
     }
 
 
-    private function remove_file_dir ($url_dim) {
+    private function remove_file_dir($url_dim)
+    {
         $files = glob($url_dim . '/*');
         // Delete all the files of the list
         foreach ($files as $file) {
@@ -389,5 +415,4 @@ class Wc_Code_Optimization_Admin
             }
         }
     }
-
 }
