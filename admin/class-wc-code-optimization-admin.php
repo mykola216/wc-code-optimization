@@ -178,11 +178,21 @@ class Wc_Code_Optimization_Admin
         return $valid;
     }
 
+    private function get_protocol_and_uri () {
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {$url = "https://";}else{$url = "http://";}
+        $url.= $_SERVER['HTTP_HOST'];
+        return $url;
+    }
+
+    private function get_setings_admin ($name) {
+        $option_filds = 'tabs_one';
+        $options = get_option($option_filds . '_option');
+        return $options[$name];
+    }
+
 
     public function combineCSSOnHomepage()
     {
-
-        // if ($this->isHomepage()) {
         isset($_POST['selectedCss']) ? $this->get_save_selected_exclude_css($_POST['selectedCss']) : $this->get_save_selected_exclude_css(array());
         $cachedPageContent =  isset($_POST['optimizedPage']) ? $this->getCachedPageContent($_POST['optimizedPage']) : '';
         $cssLinks = isset($_POST['css_url']) ? $this->getCSSLinks($cachedPageContent, $_POST['css_url']) : $this->getCSSLinks($cachedPageContent, array());
@@ -194,9 +204,6 @@ class Wc_Code_Optimization_Admin
         $rebuildCachedPageFile = $targetFolder . 'rebuild-index.html';
         $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile);
         $this->createGzipVersion($cachedPageContent, $rebuildCachedPageFile);
-        
-        
-        // }
     }
 
     private function isHomepage()
@@ -206,19 +213,18 @@ class Wc_Code_Optimization_Admin
 
     private function getCachedPageContent($cachedPage)
     {
-        $domain = parse_url(home_url(), PHP_URL_HOST);
-        $cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/' . $cachedPage;
-        var_dump($cachedPageURL);
-        return file_get_contents($cachedPageURL);
+        $cachedPageURL = ABSPATH . $this->get_setings_admin ('plugins_url') . $cachedPage;
+        if (file_get_contents($cachedPageURL)) {
+            return file_get_contents($cachedPageURL);
+        } else {
+            return 'URL eror - getCachedPageContent';
+        }
     }
 
     private function getCSSLinks($htmlContent, $exclude_css_link)
     {
-
-
         preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
         $cssLinks_arr = !empty($exclude_css_link) ? array_diff($cssLinks[1], $exclude_css_link) : $cssLinks[1];
-        //var_dump($cssLinks_arr);
         return $cssLinks_arr;
     }
 
@@ -238,9 +244,12 @@ class Wc_Code_Optimization_Admin
 
     private function getTargetFolder()
     {
-        $currentFilePath = __FILE__;
-        $rootPath = dirname(dirname($currentFilePath));
-        return $rootPath . '/rebuilt-cached-page/';
+        if (!file_exists(ABSPATH.$this->get_setings_admin ('cache_url'))) {
+            mkdir(ABSPATH.$this->get_setings_admin ('cache_url'), 0755, true);
+            return ABSPATH.$this->get_setings_admin ('cache_url');
+        } else {
+            return 'ERROR dir getTargetFolder';
+        }
     }
 
     private function saveCombinedCSSToFile($combinedCSS, $combinedCSSFile)
@@ -258,7 +267,7 @@ class Wc_Code_Optimization_Admin
 
     private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile)
     {
-        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="/wp-content/plugins/wc-code-optimization/rebuilt-cached-page/' . basename($combinedCSSFile) . '">';
+        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="'.$this->get_setings_admin ('cache_url') . basename($combinedCSSFile) . '">';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
         file_put_contents($rebuildCachedPageFile, $htmlContent);
         isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage']) : '';
@@ -276,8 +285,6 @@ class Wc_Code_Optimization_Admin
     {
         $selected_css = $exclude_css;
         update_option('selected_css', $selected_css);
-
-
         echo 'Дані успішно збережено';
     }
 
@@ -285,24 +292,18 @@ class Wc_Code_Optimization_Admin
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $jsonData = json_encode(array(
-            'id' => 234252666,
+            'id' => $this->get_setings_admin ('id_opt'),
             'site_url' => 'sht.nik',
             "page_send_cov" => "home_desctop",
-            "site_url_page" => "http://" . $domain ."/wp-content/plugins/wc-code-optimization/rebuilt-cached-page/rebuild-index.html",
-            "secret_key" => "w04856309485gj03w9485g"
+            "site_url_page" => $this->get_protocol_and_uri() .$this->get_setings_admin ('cache_url')."rebuild-index.html",
+            "secret_key" => $this->get_setings_admin ('secret_key')
         ));
 
-
-        $apiUrl = 'http://localhost:5000/api/homedesctop';
-
-
-        $ch = curl_init($apiUrl);
+        $ch = curl_init($this->get_setings_admin ('api_url'));
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json',
             'Content-Length: ' . strlen($jsonData)
@@ -318,7 +319,6 @@ class Wc_Code_Optimization_Admin
             $currentFilePath = __FILE__;
 
             $rootPath = dirname(dirname($currentFilePath));
-
 
             $targetFolderPath = $rootPath . '/rebuilt-cached-page/';
             $dataArray = json_decode($response, true);
@@ -343,14 +343,14 @@ class Wc_Code_Optimization_Admin
             $cleaned_css = preg_replace($patterns, '', $cssCode);
             // Замініть підключений CSS на test2.css в HTML
             
-            $cachedPageURL = ABSPATH . '/wp-content/plugins/wc-code-optimization/rebuilt-cached-page/rebuild-index.html';
+            $cachedPageURL = ABSPATH . $this->get_setings_admin ('cache_url').'rebuild-index.html';
             $htmlContent = file_get_contents($cachedPageURL);
 
 
-            $htmlContent = str_replace('/wp-content/plugins/wc-code-optimization/rebuilt-cached-page/combined-css.css', '/wp-content/cache/supercache/' . $domain . '/test2.css', $htmlContent);
+            $htmlContent = str_replace($this->get_setings_admin ('cache_url').'combined-css.css', $this->get_setings_admin ('plugins_url'). 'test2.css', $htmlContent);
 
             $domain = parse_url(home_url(), PHP_URL_HOST);
-            $cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/';
+            $cachedPageURL = ABSPATH . $this->get_setings_admin ('plugins_url');
 
             // Збережіть CSS у test2.css
             $output_css = $cachedPageURL . 'test2.css';
@@ -379,55 +379,15 @@ class Wc_Code_Optimization_Admin
     }
 
 
-    public function handleAjaxRequest()
-    {
-
-        $data = $_POST;
-
-
-        $currentFilePath = __FILE__;
-
-        $rootPath = dirname(dirname($currentFilePath));
-
-
-        $target_folder_path = $rootPath . '/rebuilt-cached-page/';
-        $coverage_json = $target_folder_path . 'coverage.json';
-        $combined_css = $target_folder_path . 'combined-css.css';
-
-        $coverage_data = file_get_contents($coverage_json);
-
-        $coverage_data = json_decode($coverage_data, true);
-
-        $css = array();
-        foreach ($coverage_data as $data) {
-            if (strpos($data['url'], $combined_css)) {
-                foreach ($data['ranges'] as $range) {
-                    $length = $range['end'] - $range['start'];
-                    $css[] = mb_substr($data['text'], $range['start'], $length, "UTF-8");
-                }
-                break;
+    private function remove_file_dir ($url_dim) {
+        $files = glob($url_dim . '/*');
+        // Delete all the files of the list
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                // Deleting the given file
+                unlink($file);
             }
         }
-
-        $css = implode(PHP_EOL . PHP_EOL, $css);
-
-
-        $patterns = [
-            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
-            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{/',
-            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\(\s*overflow\s*:\s*clip\)\s*\{/'
-        ];
-
-
-        $cleaned_css = preg_replace($patterns, '', $css);
-
-
-        $output_css = $target_folder_path . 'test2.css';
-        file_put_contents($output_css, $cleaned_css);
-
-        //echo $cleaned_css;
-        wp_die();
     }
+
 }

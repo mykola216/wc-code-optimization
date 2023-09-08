@@ -156,6 +156,37 @@
         submit_button();
         ?>
     </form>
+
+
+    <?php
+
+
+    $cachedPageURL = ABSPATH;
+        var_dump($cachedPageURL);
+    if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+        $url = "https://";
+    else
+        $url = "http://";
+    // Append the host(domain name, ip) to the URL.
+    $url.= $_SERVER['HTTP_HOST'];
+
+    // Append the requested resource location to the URL
+    //$url.= $_SERVER['REQUEST_URI'];
+
+    echo $url;
+
+
+    $color_text = 'plugins_url';
+    if (!empty($options[$color_text])) {
+        $plugins_url_cache = $options[$color_text];
+        $cachedPageURL = ABSPATH . $plugins_url_cache;
+        $mydir = $cachedPageURL;
+        $myfiles = array_diff(scandir($mydir), array('.', '..'));
+        foreach ($myfiles as $filename) {
+            echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
+        }
+    }
+    ?>
     <br>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
     <select name="select_page" id="select_page">
@@ -201,23 +232,6 @@ $selected_css = get_option('selected_css');
     <br>
     <p id="optimization-css"></p>
     <!-- <button class="button button-primary" id="saveButton">Generate optimized css code</button> -->
-
-
-<?php
-
-$color_text = 'site_url';
-if (!empty($options[$color_text])) {
-    $domain = $options[$color_text];
-    $cachedPageURL = ABSPATH . 'wp-content/cache/supercache/' . $domain . '/';
-    $mydir = $cachedPageURL;
-
-    $myfiles = array_diff(scandir($mydir), array('.', '..'));
-
-    foreach ($myfiles as $filename) {
-        echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
-    }
-}
-?>
 
 
 

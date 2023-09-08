@@ -2,6 +2,18 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+.button.button-primary.wc-optimized-cached-file.send_ajax_text.action:after {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-image: url(dom_object32.gif);
+    background-size: contain;
+    margin-left: 12px;
+    margin-top: -2px;
+}
+
+
 
 .lds-roller {
     display: inline-block;

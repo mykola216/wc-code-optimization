@@ -55,6 +55,9 @@
 			let selectedOption = [...selectElement.find('option:selected')];
 			let cssUrl = selectedOption.map(e => $(e).attr('css_url'));
 
+
+            $(this).addClass('send_ajax_text action');
+
 			$.ajax({
 				url: ajaxurl,
 				type: 'POST',
@@ -62,11 +65,15 @@
 					action: 'wc_optimized_css_action',
 					selectedCss: selectedCss,
 					css_url: cssUrl,
-					optimizedPage, optimizedPage
+					optimizedPage: optimizedPage
 				},
 				success: function (data) {
 					console.log('Result: ' + data);
+
 					$('#optimization-css').text(data);
+
+                    $('div.send_ajax_text').removeClass('action');
+
 				},
 				error: function () {
 					console.log('Error sending a request to the server');
