@@ -161,8 +161,17 @@
     <?php
 
 
+    function page_control_api_arrey_my ($page_name) {
+        $page_arrey = [
+            'index.html' => 'homedesctop',
+            'index-webp.html' => 'homedesctop',
+
+        ];
+
+        return $page_arrey[''];
+    }
     $cachedPageURL = ABSPATH;
-        var_dump($cachedPageURL);
+        //var_dump($cachedPageURL);
     if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
         $url = "https://";
     else
@@ -173,7 +182,7 @@
     // Append the requested resource location to the URL
     //$url.= $_SERVER['REQUEST_URI'];
 
-    echo $url;
+    //echo $url;
 
 
     $color_text = 'plugins_url';
@@ -190,24 +199,22 @@
     <br>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
     <select name="select_page" id="select_page">
-        <option value="" disabled selected>Select a page</option>
-        <option value="home-page">Home page</option>
-        <option value="home-page">Home page</option>
+        <option value="" disabled selected>Виключити CSS з оптимізації</option>
+        <option value="home-page">index.html</option>
+        <option value="home-page">index-webp.html</option>
     </select>
     <br>
     <br>
-<?php
-$domain = parse_url(home_url(), PHP_URL_HOST);
-$cachedPageURL = ABSPATH . '/wp-content/cache/supercache/' . $domain . '/index-webp.html';
-$htmlContent = file_get_contents($cachedPageURL);
-preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
-$selected_css = get_option('selected_css');
-?>
+    <?php
+    $domain = parse_url(home_url(), PHP_URL_HOST);
+    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/index.html';
+    $htmlContent = file_get_contents($cachedPageURL);
+    preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
+    $selected_css = get_option('selected_css');
+    ?>
     <select class="select-exclude-css-multiple" id="selected_exclude_css" name="selected_exclude_css[]"
             multiple="multiple" style="width: 100%;">
         <?php
-
-
         foreach ($cssLinks[1] as $cssKey => $cssUrl) {
             preg_match('/id=[\'"]([^\'"]+)[\'"]/', $cssLinks[0][$cssKey], $cssIDs);
             $selected = in_array($cssIDs[1], $selected_css) ? 'selected="selected"' : '';

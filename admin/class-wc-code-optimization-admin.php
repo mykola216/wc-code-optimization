@@ -178,6 +178,17 @@ class Wc_Code_Optimization_Admin
         return $valid;
     }
 
+    private function page_control_api_arrey($page_name = '')
+    {
+        $page_arrey = [
+            'index.html' => 'indexhtml',
+            'index-webp.html' => 'indexwebphtml',
+
+        ];
+
+        return $page_arrey[$page_name];
+    }
+
     private function get_protocol_and_uri()
     {
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
@@ -199,8 +210,27 @@ class Wc_Code_Optimization_Admin
 
     public function combineCSSOnHomepage()
     {
+        $opt_page_ajax_name = '';
+        $api_page_name = '';
+
         isset($_POST['selectedCss']) ? $this->get_save_selected_exclude_css($_POST['selectedCss']) : $this->get_save_selected_exclude_css(array());
-        $cachedPageContent =  isset($_POST['optimizedPage']) ? $this->getCachedPageContent($_POST['optimizedPage']) : '';
+
+        if (isset($_POST['optimizedPage'])) {
+            $opt_page_ajax_name = $_POST['optimizedPage'];
+
+            if (is_null($this->page_control_api_arrey($opt_page_ajax_name))) {
+                exit;
+            } else {
+                $api_page_name = $this->page_control_api_arrey($opt_page_ajax_name);
+            }
+
+
+            $cachedPageContent = $this->getCachedPageContent($opt_page_ajax_name);
+        } else {
+            echo "ERROR combineCSSOnHomepage - optimizedPage";
+        }
+
+
         $cssLinks = isset($_POST['css_url']) ? $this->getCSSLinks($cachedPageContent, $_POST['css_url']) : $this->getCSSLinks($cachedPageContent, array());
         $combinedCSS = $this->combineCSSFiles($cssLinks, $cachedPageContent);
         $targetFolder = $this->getTargetFolder();
@@ -255,7 +285,7 @@ class Wc_Code_Optimization_Admin
         return $rootPath . '/rebuilt-cached-page/';
         if (!file_exists(ABSPATH . $this->get_setings_admin('cache_url'))) {
             mkdir(ABSPATH . $this->get_setings_admin('cache_url'), 0755, true);
-           
+
             return ABSPATH . $this->get_setings_admin('cache_url');
         } else {
             return 'ERROR dir getTargetFolder';
@@ -284,10 +314,9 @@ class Wc_Code_Optimization_Admin
 
         // Прибираємо зайві пробіли
         $htmlContent = preg_replace('/^\s+$/m', '', $htmlContent);
-        
+
         return $htmlContent;
     }
-
 
 
     private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile)
@@ -401,6 +430,15 @@ class Wc_Code_Optimization_Admin
 
 
         curl_close($ch);
+    }
+
+    public function return_select_ajax_css()
+    {
+
+
+        echo '<select>';
+
+
     }
 
 
