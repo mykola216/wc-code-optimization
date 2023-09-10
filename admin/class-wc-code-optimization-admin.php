@@ -212,6 +212,7 @@ class Wc_Code_Optimization_Admin
     {
         $opt_page_ajax_name = '';
         $api_page_name = '';
+        $combined_css_page_name = '';
 
         isset($_POST['selectedCss']) ? $this->get_save_selected_exclude_css($_POST['selectedCss']) : $this->get_save_selected_exclude_css(array());
 
@@ -219,6 +220,7 @@ class Wc_Code_Optimization_Admin
             $opt_page_ajax_name = $_POST['optimizedPage'];
 
             if (is_null($this->page_control_api_arrey($opt_page_ajax_name))) {
+                echo "ERROR combineCSSOnHomepage - optimizedPage";
                 exit;
             } else {
                 $api_page_name = $this->page_control_api_arrey($opt_page_ajax_name);
@@ -230,15 +232,30 @@ class Wc_Code_Optimization_Admin
             echo "ERROR combineCSSOnHomepage - optimizedPage";
         }
 
+        $combined_css_page_name = 'combined-css-'.$api_page_name.'.css';
+        $rebuild_page_html_name = 'rebuild-index-'.$api_page_name.'.html';
+        $opt_css_prod_name = 'style-opt-prod-'.$api_page_name.'.css';
 
+        var_dump('<br>$api_page_name             1111  '.$api_page_name);
+        var_dump('<br>$combined_css_page_name    2222  '.$combined_css_page_name);
+        var_dump('<br>$rebuild_page_html_name    3333  '.$rebuild_page_html_name);
+        var_dump('<br>$opt_css_prod_name         4444  '.$opt_css_prod_name);
+
+
+/*
+        if ($combined_css_page_name = '' && $rebuild_page_html_name = '' && $opt_css_prod_name = '') {
+            echo "ERROR combineCSSOnHomepage - optimizedPage";
+            exit;
+        }
+*/
         $cssLinks = isset($_POST['css_url']) ? $this->getCSSLinks($cachedPageContent, $_POST['css_url']) : $this->getCSSLinks($cachedPageContent, array());
         $combinedCSS = $this->combineCSSFiles($cssLinks, $cachedPageContent);
         $targetFolder = $this->getTargetFolder();
-        $combinedCSSFile = $targetFolder . 'combined-css.css';
+        $combinedCSSFile = $targetFolder . $combined_css_page_name;
         $this->saveCombinedCSSToFile($combinedCSS, $combinedCSSFile);
         $cachedPageContent = isset($_POST['css_url']) ? $this->removeStyleTags($cachedPageContent, $_POST['css_url']) : $this->removeStyleTags($cachedPageContent, array());
-        $rebuildCachedPageFile = $targetFolder . 'rebuild-index.html';
-        $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile);
+        $rebuildCachedPageFile = $targetFolder . $rebuild_page_html_name;
+        $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name);
         $this->createGzipVersion($cachedPageContent, $rebuildCachedPageFile);
     }
 
@@ -319,12 +336,12 @@ class Wc_Code_Optimization_Admin
     }
 
 
-    private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile)
+    private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name)
     {
         $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '">';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
         file_put_contents($rebuildCachedPageFile, $htmlContent);
-        isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage']) : '';
+        isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name) : '';
     }
 
     private function createGzipVersion($htmlContent, $rebuildCachedPageFile)
@@ -342,14 +359,14 @@ class Wc_Code_Optimization_Admin
         echo 'Дані успішно збережено';
     }
 
-    public function send_data_server($cachedPage)
+    public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name)
     {
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $jsonData = json_encode(array(
             'id' => $this->get_setings_admin('id_opt'),
             'site_url' => 'sht.nik',
             "page_send_cov" => "home_desctop",
-            "site_url_page" => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . "rebuild-index.html",
+            "site_url_page" => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
             "secret_key" => $this->get_setings_admin('secret_key')
         ));
 
@@ -397,17 +414,17 @@ class Wc_Code_Optimization_Admin
             $cleaned_css = preg_replace($patterns, '', $cssCode);
             // Замініть підключений CSS на test2.css в HTML
 
-            $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . 'rebuild-index.html';
+            $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
             $htmlContent = file_get_contents($cachedPageURL);
 
 
-            $htmlContent = str_replace($this->get_setings_admin('cache_url') . 'combined-css.css', $this->get_setings_admin('plugins_url') . 'test2.css', $htmlContent);
+            $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $this->get_setings_admin('plugins_url') . $opt_css_prod_name, $htmlContent);
 
             $domain = parse_url(home_url(), PHP_URL_HOST);
             $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
 
             // Збережіть CSS у test2.css
-            $output_css = $cachedPageURL . 'test2.css';
+            $output_css = $cachedPageURL . $opt_css_prod_name;
             file_put_contents($output_css, $cleaned_css);
 
             // Збережіть змінений HTML у rebuild-index-webp.html
