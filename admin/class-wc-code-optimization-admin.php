@@ -425,7 +425,7 @@ class Wc_Code_Optimization_Admin
 
             // Збережіть CSS у test2.css
             $output_css = $cachedPageURL . $opt_css_prod_name;
-            file_put_contents($output_css, $cleaned_css);
+            file_put_contents($output_css, $cleaned_css, FILE_APPEND | LOCK_EX);
 
             // Збережіть змінений HTML у rebuild-index-webp.html
             $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
@@ -436,7 +436,6 @@ class Wc_Code_Optimization_Admin
             // create file new
             file_put_contents($rebuildCachedPageFile, $htmlContent, FILE_APPEND | LOCK_EX);
 
-
             // Створіть та збережіть файл rebuild-index-webp.html.gz
             $gzipContent = gzencode($htmlContent, 9);
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
@@ -444,7 +443,6 @@ class Wc_Code_Optimization_Admin
 
             //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
-
 
         curl_close($ch);
     }
