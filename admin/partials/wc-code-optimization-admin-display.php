@@ -184,7 +184,7 @@
 
     //echo $url;
 
-
+    $all_files = array();
     $color_text = 'plugins_url';
     if (!empty($options[$color_text])) {
         $plugins_url_cache = $options[$color_text];
@@ -193,6 +193,7 @@
         $myfiles = array_diff(scandir($mydir), array('.', '..'));
         foreach ($myfiles as $filename) {
             echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
+            $all_files[] = $filename;
         }
     }
     ?>
@@ -206,8 +207,17 @@
     <br>
     <br>
     <?php
+    $file_select_css = null;
+    foreach ($all_files as $file) {
+        $file_array = explode('.', $file);
+        if(substr($file, 0, 4) === "old_"){
+            $file_select_css = $file;
+            break;
+        };
+        end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
+    }
     $domain = parse_url(home_url(), PHP_URL_HOST);
-    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/index.html';
+    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
     $htmlContent = file_get_contents($cachedPageURL);
     preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
     $selected_css = get_option('selected_css');
