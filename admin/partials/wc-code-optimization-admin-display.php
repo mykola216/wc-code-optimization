@@ -181,6 +181,21 @@
                     <small>font_src</small>
                 </label>
             </p>
+            <p>
+                <?php $color_text = 'my_css_code'; ?>
+                <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       value=""
+                ><?php if (!empty($options[$color_text])) {
+                           echo $options[$color_text];
+                       } else {
+                           echo '';
+                       } ?></textarea>
+                <label for="url">
+                    <small>my_css_code</small>
+                </label>
+            </p>
         </div>
         <?php
         submit_button();

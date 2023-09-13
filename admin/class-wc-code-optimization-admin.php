@@ -402,7 +402,7 @@ class Wc_Code_Optimization_Admin
             // Отримуємо CSS код з асоціативного масиву
             $cssCode .= $dataArray['message'];
 
-
+            
             $patterns = [
                 '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
                 '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
@@ -431,7 +431,7 @@ class Wc_Code_Optimization_Admin
             
             
             
-              
+            $cleaned_css .=  $this -> get_setings_admin('my_css_code');
             
             $output_css = $cachedPageURL . $opt_css_prod_name;
             file_put_contents($output_css, $cleaned_css, FILE_APPEND | LOCK_EX);
@@ -450,7 +450,7 @@ class Wc_Code_Optimization_Admin
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
             file_put_contents($rebuildCachedPageGzFile, $gzipContent);
 
-            echo 'Відповідь від сервера: ' . $cleaned_css;
+            //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
 
         curl_close($ch);
