@@ -183,6 +183,21 @@ class Wc_Code_Optimization_Admin
         $page_arrey = [
             'index.html' => 'indexhtml',
             'index-webp.html' => 'indexwebphtml',
+            'index-webp-https.html' => 'indexwebphttpshtml',
+            'index-mobile.html' => 'indexmobilehtml'
+
+        ];
+
+        return $page_arrey[$page_name];
+    }
+
+    private function page_control_api_url($page_name = '')
+    {
+        $page_arrey = [
+            'indexhtml' => 'api/homedesctop',
+            'indexwebphtml' => 'api/homedesctop',
+            'indexwebphttpshtml' => 'api/homedesctop',
+            'indexmobilehtml' => 'api/homemobile'
 
         ];
 
@@ -255,7 +270,7 @@ class Wc_Code_Optimization_Admin
         $this->saveCombinedCSSToFile($combinedCSS, $combinedCSSFile);
         $cachedPageContent = isset($_POST['css_url']) ? $this->removeStyleTags($cachedPageContent, $_POST['css_url']) : $this->removeStyleTags($cachedPageContent, array());
         $rebuildCachedPageFile = $targetFolder . $rebuild_page_html_name;
-        $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name);
+        $this->addCombinedCSSToHTML($cachedPageContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name);
         $this->createGzipVersion($cachedPageContent, $rebuildCachedPageFile);
     }
 
@@ -336,12 +351,12 @@ class Wc_Code_Optimization_Admin
     }
 
 
-    private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name)
+    private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
     {
         $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '">';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
         file_put_contents($rebuildCachedPageFile, $htmlContent);
-        isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name) : '';
+        isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name) : '';
     }
 
     private function createGzipVersion($htmlContent, $rebuildCachedPageFile)
@@ -359,8 +374,11 @@ class Wc_Code_Optimization_Admin
         echo 'Дані успішно збережено';
     }
 
-    public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name)
+    public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
     {
+        $uri_api_post = '';
+        $uri_api_post_page = '';
+
         $domain = parse_url(home_url(), PHP_URL_HOST);
         $jsonData = json_encode(array(
             'id' => $this->get_setings_admin('id_opt'),
@@ -370,7 +388,34 @@ class Wc_Code_Optimization_Admin
             "secret_key" => $this->get_setings_admin('secret_key')
         ));
 
-        $ch = curl_init($this->get_setings_admin('api_url'));
+
+
+
+        ///api/homemobile
+        ///api/homedesctop
+        if ($this->page_control_api_url($this->page_control_api_arrey($opt_page_ajax_name))) {
+
+
+
+            $uri_api_post_page = $this->page_control_api_url($this->page_control_api_arrey($opt_page_ajax_name));
+
+
+        } else {
+
+            echo "ERROR send_data_server - api url";
+            exit;
+
+        }
+
+        $uri_api_post = $this->get_setings_admin('api_url').$uri_api_post_page;
+
+
+
+        var_dump('<br>uri_api_post ---- '.$uri_api_post);
+        var_dump('<br>site_url_page ---- '.$this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name);
+
+
+        $ch = curl_init($uri_api_post);
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -402,7 +447,7 @@ class Wc_Code_Optimization_Admin
             // Отримуємо CSS код з асоціативного масиву
             $cssCode .= $dataArray['message'];
 
-            
+
             $patterns = [
                 '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
                 '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
@@ -417,7 +462,7 @@ class Wc_Code_Optimization_Admin
 
 
             $cleaned_css = preg_replace($patterns, '', $cssCode);
-            
+
             
             $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
             $htmlContent = file_get_contents($cachedPageURL);
@@ -427,9 +472,6 @@ class Wc_Code_Optimization_Admin
 
             $domain = parse_url(home_url(), PHP_URL_HOST);
             $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
-
-            
-            
             
             $cleaned_css .=  $this -> get_setings_admin('my_css_code');
             
