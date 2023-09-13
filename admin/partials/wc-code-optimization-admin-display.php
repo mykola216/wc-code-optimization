@@ -151,6 +151,36 @@
                     <small>cache_url</small>
                 </label>
             </p>
+            <p>
+                <?php $color_text = 'font_family'; ?>
+                <input type="text" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       value="<?php if (!empty($options[$color_text])) {
+                           echo $options[$color_text];
+                       } else {
+                           echo '';
+                       } ?>"
+                />
+                <label for="url">
+                    <small>font_family</small>
+                </label>
+            </p>
+            <p>
+                <?php $color_text = 'font_src'; ?>
+                <input type="text" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                       value="<?php if (!empty($options[$color_text])) {
+                           echo $options[$color_text];
+                       } else {
+                           echo '';
+                       } ?>"
+                />
+                <label for="url">
+                    <small>font_src</small>
+                </label>
+            </p>
         </div>
         <?php
         submit_button();

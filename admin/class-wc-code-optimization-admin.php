@@ -394,8 +394,13 @@ class Wc_Code_Optimization_Admin
             $targetFolderPath = $rootPath . '/rebuilt-cached-page/';
             $dataArray = json_decode($response, true);
 
+            $font_family = $this -> get_setings_admin('font_family');
+            $font_src = $this -> get_setings_admin('font_src');
+            $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("'. $font_src .'") format("'. end(explode('.', $font_src)) .'"); }';
+
+            $cssCode = $fonts;
             // Отримуємо CSS код з асоціативного масиву
-            $cssCode = $dataArray['message'];
+            $cssCode .= $dataArray['message'];
 
 
             $patterns = [
@@ -412,8 +417,8 @@ class Wc_Code_Optimization_Admin
 
 
             $cleaned_css = preg_replace($patterns, '', $cssCode);
-            // Замініть підключений CSS на test2.css в HTML
-
+            
+            
             $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
             $htmlContent = file_get_contents($cachedPageURL);
 
@@ -423,7 +428,11 @@ class Wc_Code_Optimization_Admin
             $domain = parse_url(home_url(), PHP_URL_HOST);
             $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
 
-            // Збережіть CSS у test2.css
+            
+            
+            
+              
+            
             $output_css = $cachedPageURL . $opt_css_prod_name;
             file_put_contents($output_css, $cleaned_css, FILE_APPEND | LOCK_EX);
 
@@ -441,7 +450,7 @@ class Wc_Code_Optimization_Admin
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
             file_put_contents($rebuildCachedPageGzFile, $gzipContent);
 
-            //echo 'Відповідь від сервера: ' . $cleaned_css;
+            echo 'Відповідь від сервера: ' . $cleaned_css;
         }
 
         curl_close($ch);
