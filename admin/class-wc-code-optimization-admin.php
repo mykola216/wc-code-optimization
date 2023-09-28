@@ -251,10 +251,10 @@ class Wc_Code_Optimization_Admin
         $rebuild_page_html_name = 'rebuild-index-'.$api_page_name.'.html';
         $opt_css_prod_name = 'style-opt-prod-'.$api_page_name.'.css';
 
-        var_dump('<br>$api_page_name             1111  '.$api_page_name);
-        var_dump('<br>$combined_css_page_name    2222  '.$combined_css_page_name);
-        var_dump('<br>$rebuild_page_html_name    3333  '.$rebuild_page_html_name);
-        var_dump('<br>$opt_css_prod_name         4444  '.$opt_css_prod_name);
+        echo '<br>$api_page_name             1111  '.$api_page_name;
+        echo '<br>$combined_css_page_name    2222  '.$combined_css_page_name;
+        echo '<br>$rebuild_page_html_name    3333  '.$rebuild_page_html_name;
+        echo '<br>$opt_css_prod_name         4444  '.$opt_css_prod_name;
 
 
 /*
@@ -371,7 +371,7 @@ class Wc_Code_Optimization_Admin
     {
         $selected_css = $exclude_css;
         update_option('selected_css', $selected_css);
-        echo 'Дані успішно збережено';
+        echo 'Data has been successfully saved';
     }
 
     public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
@@ -413,8 +413,8 @@ class Wc_Code_Optimization_Admin
 
 
 
-        var_dump('<br>uri_api_post ---- '.$uri_api_post);
-        var_dump('<br>site_url_page ---- '.$this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name);
+        echo '<br>uri_api_post ---- '.$uri_api_post;
+        echo '<br>site_url_page ---- '.$this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
 
 
         $ch = curl_init($uri_api_post);
@@ -440,7 +440,7 @@ class Wc_Code_Optimization_Admin
 
             $targetFolderPath = $rootPath . '/rebuilt-cached-page/';
             $dataArray = json_decode($response, true);
-
+          
             $font_family = $this -> get_setings_admin('font_family');
             $font_src = $this -> get_setings_admin('font_src');
             $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("'. $font_src .'") format("'. end(explode('.', $font_src)) .'"); }';
@@ -493,7 +493,7 @@ class Wc_Code_Optimization_Admin
             $gzipContent = gzencode($htmlContent, 9);
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
             file_put_contents($rebuildCachedPageGzFile, $gzipContent);
-
+            echo $dataArray['resultItem'];
             //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
 

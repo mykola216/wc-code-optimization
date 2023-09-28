@@ -70,7 +70,7 @@
 				success: function (data) {
 					console.log('Result: ' + data);
 
-					$('#optimization-css').text(data);
+					$('#optimization-css').html(data);
 
                     $('div.send_ajax_text').removeClass('action');
 
