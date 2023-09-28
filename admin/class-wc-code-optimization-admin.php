@@ -385,7 +385,9 @@ class Wc_Code_Optimization_Admin
             'site_url' => 'sht.nik',
             "page_send_cov" => "home_desctop",
             "site_url_page" => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
-            "secret_key" => $this->get_setings_admin('secret_key')
+            "secret_key" => $this->get_setings_admin('secret_key'),
+            "css_id_or_class_click" => $this->get_setings_admin('css_id_or_class_click'),
+            "css_id_or_class_hover" => $this->get_setings_admin('css_id_or_class_hover')
         ));
 
 
