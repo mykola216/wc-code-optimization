@@ -81,6 +81,21 @@
 			});
 		});
 
+		$('#clear_optimized_css').click(function () {
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wc_clear_optimized_css_action',
+				},
+				success: function (data) {
+					$('#optimization-css').html(data.slice(0, -1));
+				},
+				error: function () {
+					console.log('Error sending a request to the server');
+				}
+			});
+		});
 		// $('#send-data-server').click(function () {
 		// 	$('.lds-roller').show();
 		// 	$.ajax({

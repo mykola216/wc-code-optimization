@@ -231,7 +231,34 @@
         submit_button();
         ?>
     </form>
-
+    <p>Select exclude css</p>
+    <?php
+    $file_select_css = null;
+    foreach ($all_files as $file) {
+        $file_array = explode('.', $file);
+        if(substr($file, 0, 4) === "old_"){
+            $file_select_css = $file;
+            break;
+        };
+        end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
+    }
+    $domain = parse_url(home_url(), PHP_URL_HOST);
+    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
+    $htmlContent = file_get_contents($cachedPageURL);
+    preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
+    $selected_css = get_option('selected_css');
+    ?>
+    <select class="select-exclude-css-multiple" id="selected_exclude_css" style="width: 50%; min-height: 250px;" name="selected_exclude_css[]"
+            multiple="multiple" style="width: 100%;">
+        <?php
+        foreach ($cssLinks[1] as $cssKey => $cssUrl) {
+            preg_match('/id=[\'"]([^\'"]+)[\'"]/', $cssLinks[0][$cssKey], $cssIDs);
+            $selected = in_array($cssIDs[1], $selected_css) ? 'selected="selected"' : '';
+            echo '<option value="' . $cssIDs[1] . '" css_url="' . $cssUrl . '"' . $selected . '>' . "id='{$cssIDs[1]}'" . '</option>';
+        }
+        ?>
+    </select>
+    <br>
 
     <?php
 
@@ -258,7 +285,7 @@
     //$url.= $_SERVER['REQUEST_URI'];
 
     //echo $url;
-
+    
     $all_files = array();
     $color_text = 'plugins_url';
     if (!empty($options[$color_text])) {
@@ -273,44 +300,19 @@
     }
     ?>
     <br>
+    <p><div class="button button-primary" id="clear_optimized_css" style="background-color: red;">Clear optimized css</div></p>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
-    <select name="select_page" id="select_page">
+    <!-- <select name="select_page" id="select_page">
         <option value="" disabled selected>Виключити CSS з оптимізації</option>
         <option value="home-page">index.html</option>
         <option value="home-page">index-webp.html</option>
-    </select>
+    </select> -->
     <br>
     <br>
-    <?php
-    $file_select_css = null;
-    foreach ($all_files as $file) {
-        $file_array = explode('.', $file);
-        if(substr($file, 0, 4) === "old_"){
-            $file_select_css = $file;
-            break;
-        };
-        end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
-    }
-    $domain = parse_url(home_url(), PHP_URL_HOST);
-    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
-    $htmlContent = file_get_contents($cachedPageURL);
-    preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
-    $selected_css = get_option('selected_css');
-    ?>
-    <select class="select-exclude-css-multiple" id="selected_exclude_css" name="selected_exclude_css[]"
-            multiple="multiple" style="width: 100%;">
-        <?php
-        foreach ($cssLinks[1] as $cssKey => $cssUrl) {
-            preg_match('/id=[\'"]([^\'"]+)[\'"]/', $cssLinks[0][$cssKey], $cssIDs);
-            $selected = in_array($cssIDs[1], $selected_css) ? 'selected="selected"' : '';
-            echo '<option value="' . $cssIDs[1] . '" css_url="' . $cssUrl . '"' . $selected . '>' . "id='{$cssIDs[1]}'" . '</option>';
-        }
-        ?>
-    </select>
+    
     <br>
-    <br>
-    <button class="button button-primary" id="generate-optimized-css-code">Generate optimized css code</button>
-    <button class="button button-primary" id="send-data-server">Send data to the server</button>
+    <!-- <button class="button button-primary" id="generate-optimized-css-code">Generate optimized css code</button>
+    <button class="button button-primary" id="send-data-server">Send data to the server</button> -->
     <div class="lds-roller" style="display: none;">
         <div></div>
         <div></div>

@@ -178,9 +178,9 @@ class Wc_Code_Optimization_Admin
         return $valid;
     }
 
-    private function page_control_api_arrey($page_name = '')
+    private function page_control_api_array($page_name = '')
     {
-        $page_arrey = [
+        $page_array = [
             'index.html' => 'indexhtml',
             'index-webp.html' => 'indexwebphtml',
             'index-webp-https.html' => 'indexwebphttpshtml',
@@ -188,12 +188,12 @@ class Wc_Code_Optimization_Admin
 
         ];
 
-        return $page_arrey[$page_name];
+        return $page_array[$page_name];
     }
 
     private function page_control_api_url($page_name = '')
     {
-        $page_arrey = [
+        $page_array = [
             'indexhtml' => 'api/homedesctop',
             'indexwebphtml' => 'api/homedesctop',
             'indexwebphttpshtml' => 'api/homedesctop',
@@ -201,7 +201,7 @@ class Wc_Code_Optimization_Admin
 
         ];
 
-        return $page_arrey[$page_name];
+        return $page_array[$page_name];
     }
 
     private function get_protocol_and_uri()
@@ -234,11 +234,11 @@ class Wc_Code_Optimization_Admin
         if (isset($_POST['optimizedPage'])) {
             $opt_page_ajax_name = $_POST['optimizedPage'];
 
-            if (is_null($this->page_control_api_arrey($opt_page_ajax_name))) {
+            if (is_null($this->page_control_api_array($opt_page_ajax_name))) {
                 echo "ERROR combineCSSOnHomepage - optimizedPage";
                 exit;
             } else {
-                $api_page_name = $this->page_control_api_arrey($opt_page_ajax_name);
+                $api_page_name = $this->page_control_api_array($opt_page_ajax_name);
             }
 
 
@@ -395,11 +395,11 @@ class Wc_Code_Optimization_Admin
 
         ///api/homemobile
         ///api/homedesctop
-        if ($this->page_control_api_url($this->page_control_api_arrey($opt_page_ajax_name))) {
+        if ($this->page_control_api_url($this->page_control_api_array($opt_page_ajax_name))) {
 
 
 
-            $uri_api_post_page = $this->page_control_api_url($this->page_control_api_arrey($opt_page_ajax_name));
+            $uri_api_post_page = $this->page_control_api_url($this->page_control_api_array($opt_page_ajax_name));
 
 
         } else {
@@ -434,11 +434,9 @@ class Wc_Code_Optimization_Admin
         if (curl_errno($ch)) {
             echo 'Помилка cURL: ' . curl_error($ch);
         } else {
-            $currentFilePath = __FILE__;
 
-            $rootPath = dirname(dirname($currentFilePath));
-
-            $targetFolderPath = $rootPath . '/rebuilt-cached-page/';
+            $link_coverage_css = plugins_url('/', dirname(__FILE__)) . 'coverage-css/';
+            $targetFolderPath = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
             $dataArray = json_decode($response, true);
           
             $font_family = $this -> get_setings_admin('font_family');
@@ -468,9 +466,9 @@ class Wc_Code_Optimization_Admin
             
             $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
             $htmlContent = file_get_contents($cachedPageURL);
+            
 
-
-            $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $this->get_setings_admin('plugins_url') . $opt_css_prod_name, $htmlContent);
+            $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $link_coverage_css . $opt_css_prod_name, $htmlContent);
 
             $domain = parse_url(home_url(), PHP_URL_HOST);
             $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
@@ -478,7 +476,7 @@ class Wc_Code_Optimization_Admin
             $cleaned_css .=  $this -> get_setings_admin('my_css_code');
             
             $output_css = $cachedPageURL . $opt_css_prod_name;
-            file_put_contents($output_css, $cleaned_css, FILE_APPEND | LOCK_EX);
+            file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css, FILE_APPEND | LOCK_EX);
 
             // Збережіть змінений HTML у rebuild-index-webp.html
             $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
@@ -509,6 +507,32 @@ class Wc_Code_Optimization_Admin
 
     }
 
+    public function clear_optimized_css() {
+        $directory = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
+    
+        // Рекурсивна функція для видалення вмісту директорій
+        function delete_directory_contents($path) {
+            if (is_dir($path)) {
+                $files = glob($path . '/*');
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    } elseif (is_dir($file)) {
+                        delete_directory_contents($file);
+                        rmdir($file);
+                    }
+                }
+            }
+        }
+    
+        // Виклик рекурсивної функції для видалення вмісту директорії
+        delete_directory_contents($directory);
+    
+        echo '<h3 style="color: green;">Optimized css deleted</h3>';
+    }
+    
+    
+    
 
     private function remove_file_dir($url_dim)
     {
