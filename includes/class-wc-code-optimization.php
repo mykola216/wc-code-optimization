@@ -169,9 +169,14 @@ class Wc_Code_Optimization
 		// Add Settings link to the plugin
 		$plugin_basename = plugin_basename(plugin_dir_path(__DIR__) . $this->plugin_name . '.php');
 		$this->loader->add_filter('plugin_action_links_' . $plugin_basename, $plugin_admin, 'add_action_links');
-		
-		$this->loader->add_action( 'wp_ajax_wc_optimized_css_action', $plugin_admin, 'combineCSSOnHomepage');
-		$this->loader->add_action( 'wp_ajax_wc_clear_optimized_css_action', $plugin_admin, 'clear_optimized_css');
+		$option_filds = 'tabs_one';
+        $options = get_option($option_filds . '_option');
+        if(isset($options['enable_disable_plugin'])){
+			$this->loader->add_action( 'wp_ajax_wc_optimized_css_action', $plugin_admin, 'combineCSSOnHomepage');
+		}else{
+			$this->loader->add_action( 'wp_ajax_wc_optimized_css_action', $plugin_admin, 'enable_disable_plugin');
+		}
+			$this->loader->add_action( 'wp_ajax_wc_clear_optimized_css_action', $plugin_admin, 'clear_optimized_css');
 		
 		// $this->loader->add_action( 'wp_ajax_wc_send_data_server_action', $plugin_admin, 'send_data_server');
 		

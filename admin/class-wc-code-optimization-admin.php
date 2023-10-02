@@ -415,7 +415,7 @@ class Wc_Code_Optimization_Admin
 
         echo '<br>uri_api_post ---- '.$uri_api_post;
         echo '<br>site_url_page ---- '.$this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
-
+        
 
         $ch = curl_init($uri_api_post);
 
@@ -533,6 +533,9 @@ class Wc_Code_Optimization_Admin
     
     
     
+    public function enable_disable_plugin(){
+        echo '<h3 style="color: red;">The plugin is disabled</h3><br>';
+    }
 
     private function remove_file_dir($url_dim)
     {

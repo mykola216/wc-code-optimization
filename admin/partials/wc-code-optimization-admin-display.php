@@ -226,40 +226,24 @@
                     <small>css_id_or_class_hover</small>
                 </label>
             </p>
+            <p>
+                <?php $enable_disable_plugin = 'enable_disable_plugin'; ?>
+                <input type="checkbox" id="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                    name="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                    <?php if (!empty($options[$enable_disable_plugin])) {
+                        echo 'checked="checked"';
+                    } ?>
+                >
+                <label for="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]">
+                    <small>enable_disable_plugin</small>
+                </label>
+            </p>
+
         </div>
         <?php
         submit_button();
         ?>
     </form>
-    <p>Select exclude css</p>
-    <?php
-    $file_select_css = null;
-    foreach ($all_files as $file) {
-        $file_array = explode('.', $file);
-        if(substr($file, 0, 4) === "old_"){
-            $file_select_css = $file;
-            break;
-        };
-        end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
-    }
-    $domain = parse_url(home_url(), PHP_URL_HOST);
-    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
-    $htmlContent = file_get_contents($cachedPageURL);
-    preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
-    $selected_css = get_option('selected_css');
-    ?>
-    <select class="select-exclude-css-multiple" id="selected_exclude_css" style="width: 50%; min-height: 250px;" name="selected_exclude_css[]"
-            multiple="multiple" style="width: 100%;">
-        <?php
-        foreach ($cssLinks[1] as $cssKey => $cssUrl) {
-            preg_match('/id=[\'"]([^\'"]+)[\'"]/', $cssLinks[0][$cssKey], $cssIDs);
-            $selected = in_array($cssIDs[1], $selected_css) ? 'selected="selected"' : '';
-            echo '<option value="' . $cssIDs[1] . '" css_url="' . $cssUrl . '"' . $selected . '>' . "id='{$cssIDs[1]}'" . '</option>';
-        }
-        ?>
-    </select>
-    <br>
-
     <?php
 
 
@@ -299,6 +283,36 @@
         }
     }
     ?>
+    <p>Select exclude css</p>
+    <?php
+    $file_select_css = null;
+    foreach ($all_files as $file) {
+        $file_array = explode('.', $file);
+        if(substr($file, 0, 4) === "old_"){
+            $file_select_css = $file;
+            break;
+        };
+        end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
+    }
+    $domain = parse_url(home_url(), PHP_URL_HOST);
+    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
+    $htmlContent = file_get_contents($cachedPageURL);
+    preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
+    $selected_css = get_option('selected_css');
+    ?>
+    <select class="select-exclude-css-multiple" id="selected_exclude_css" style="width: 50%; min-height: 250px;" name="selected_exclude_css[]"
+            multiple="multiple" style="width: 100%;">
+        <?php
+        foreach ($cssLinks[1] as $cssKey => $cssUrl) {
+            preg_match('/id=[\'"]([^\'"]+)[\'"]/', $cssLinks[0][$cssKey], $cssIDs);
+            $selected = in_array($cssIDs[1], $selected_css) ? 'selected="selected"' : '';
+            echo '<option value="' . $cssIDs[1] . '" css_url="' . $cssUrl . '"' . $selected . '>' . "id='{$cssIDs[1]}'" . '</option>';
+        }
+        ?>
+    </select>
+    <br>
+
+    
     <br>
     <p><div class="button button-primary" id="clear_optimized_css" style="background-color: red;">Clear optimized css</div></p>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
