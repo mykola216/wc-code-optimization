@@ -353,7 +353,7 @@ class Wc_Code_Optimization_Admin
 
     private function addCombinedCSSToHTML($htmlContent, $rebuildCachedPageFile, $combinedCSSFile, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
     {
-        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '">';
+        $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '" async>';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
         file_put_contents($rebuildCachedPageFile, $htmlContent);
         isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name) : '';

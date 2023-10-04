@@ -75,8 +75,10 @@
                     $('div.send_ajax_text').removeClass('action');
 
 				},
-				error: function () {
-					console.log('Error sending a request to the server');
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR);
+					console.log(textStatus);
+					console.log(errorThrown);
 				}
 			});
 		});
