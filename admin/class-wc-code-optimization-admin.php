@@ -184,7 +184,9 @@ class Wc_Code_Optimization_Admin
             'index.html' => 'indexhtml',
             'index-webp.html' => 'indexwebphtml',
             'index-webp-https.html' => 'indexwebphttpshtml',
-            'index-mobile.html' => 'indexmobilehtml'
+            'index-mobile.html' => 'indexmobilehtml',
+            'index-webp-mobile.html' => 'indexwebpmobilehtml',
+            'index-https-mobile.html' => 'indexhttpsmobilehtml'
 
         ];
 
@@ -197,8 +199,9 @@ class Wc_Code_Optimization_Admin
             'indexhtml' => 'api/homedesctop',
             'indexwebphtml' => 'api/homedesctop',
             'indexwebphttpshtml' => 'api/homedesctop',
-            'indexmobilehtml' => 'api/homemobile'
-
+            'indexmobilehtml' => 'api/homemobile',
+            'indexwebpmobilehtml' => 'api/homemobile',
+            'indexhttpsmobilehtml' => 'api/homemobile'
         ];
 
         return $page_array[$page_name];
@@ -457,7 +460,8 @@ class Wc_Code_Optimization_Admin
                 '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
                 '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{/',
                 '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-                '/\(\s*overflow\s*:\s*clip\)\s*\{/'
+                '/\(\s*overflow\s*:\s*clip\)\s*\{/',
+                '/\(\s*max-width\s*:\s*\d+\.\d+\s*px\s*\)\s*\{/'
             ];
 
 
