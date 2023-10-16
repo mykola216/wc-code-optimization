@@ -183,6 +183,7 @@ class Wc_Code_Optimization_Admin
         $page_array = [
             'index.html' => 'indexhtml',
             'index-webp.html' => 'indexwebphtml',
+            'index-https.html' => 'indexhttpshtml',
             'index-webp-https.html' => 'indexwebphttpshtml',
             'index-mobile.html' => 'indexmobilehtml',
             'index-webp-mobile.html' => 'indexwebpmobilehtml',
@@ -198,6 +199,7 @@ class Wc_Code_Optimization_Admin
         $page_array = [
             'indexhtml' => 'api/homedesctop',
             'indexwebphtml' => 'api/homedesctop',
+            'indexhttpshtml' => 'api/homedesctop',
             'indexwebphttpshtml' => 'api/homedesctop',
             'indexmobilehtml' => 'api/homemobile',
             'indexwebpmobilehtml' => 'api/homemobile',
@@ -306,10 +308,10 @@ class Wc_Code_Optimization_Admin
             $cssContent = file_get_contents($cssUrl);
             $combinedCSS .= $cssContent;
         }
-        preg_match_all('/<style[^>]*>(.*?)<\/style>/is', $htmlContent, $inlineStyles);
-        foreach ($inlineStyles[1] as $inlineStyle) {
-            $combinedCSS .= $inlineStyle;
-        }
+        // preg_match_all('/<style[^>]*>(.*?)<\/style>/is', $htmlContent, $inlineStyles);
+        // foreach ($inlineStyles[1] as $inlineStyle) {
+        //     $combinedCSS .= $inlineStyle;
+        // }
         return $combinedCSS;
     }
 
@@ -329,7 +331,7 @@ class Wc_Code_Optimization_Admin
 
     private function saveCombinedCSSToFile($combinedCSS, $combinedCSSFile)
     {
-        file_put_contents($combinedCSSFile, $combinedCSS);
+        file_put_contents($combinedCSSFile, $combinedCSS, FILE_APPEND | LOCK_EX);
     }
 
     private function removeStyleTags($htmlContent, $allowedStyles)
@@ -358,7 +360,7 @@ class Wc_Code_Optimization_Admin
     {
         $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '" async>';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
-        file_put_contents($rebuildCachedPageFile, $htmlContent);
+        file_put_contents($rebuildCachedPageFile, $htmlContent, FILE_APPEND | LOCK_EX);
         isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name) : '';
     }
 
@@ -366,7 +368,7 @@ class Wc_Code_Optimization_Admin
     {
         $gzipContent = gzencode($htmlContent, 9); // 9 - максимальна стисненість
         $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-        file_put_contents($rebuildCachedPageGzFile, $gzipContent);
+        file_put_contents($rebuildCachedPageGzFile, $gzipContent, FILE_APPEND | LOCK_EX);
     }
 
 
@@ -494,7 +496,7 @@ class Wc_Code_Optimization_Admin
             // Створіть та збережіть файл rebuild-index-webp.html.gz
             $gzipContent = gzencode($htmlContent, 9);
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-            file_put_contents($rebuildCachedPageGzFile, $gzipContent);
+            file_put_contents($rebuildCachedPageGzFile, $gzipContent, FILE_APPEND | LOCK_EX);
             echo $dataArray['resultItem'];
             //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
