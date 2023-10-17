@@ -308,10 +308,10 @@ class Wc_Code_Optimization_Admin
             $cssContent = file_get_contents($cssUrl);
             $combinedCSS .= $cssContent;
         }
-        // preg_match_all('/<style[^>]*>(.*?)<\/style>/is', $htmlContent, $inlineStyles);
-        // foreach ($inlineStyles[1] as $inlineStyle) {
-        //     $combinedCSS .= $inlineStyle;
-        // }
+        preg_match_all('/<style[^>]*>(.*?)<\/style>/is', $htmlContent, $inlineStyles);
+        foreach ($inlineStyles[1] as $inlineStyle) {
+            $combinedCSS .= $inlineStyle;
+        }
         return $combinedCSS;
     }
 
@@ -380,129 +380,99 @@ class Wc_Code_Optimization_Admin
     }
 
     public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
-    {
-        $uri_api_post = '';
-        $uri_api_post_page = '';
+{
+    $domain = parse_url(home_url(), PHP_URL_HOST);
 
-        $domain = parse_url(home_url(), PHP_URL_HOST);
-        $jsonData = json_encode(array(
-            'id' => $this->get_setings_admin('id_opt'),
-            'site_url' => 'sht.nik',
-            "page_send_cov" => "home_desctop",
-            "site_url_page" => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
-            "secret_key" => $this->get_setings_admin('secret_key'),
-            "css_id_or_class_click" => $this->get_setings_admin('css_id_or_class_click'),
-            "css_id_or_class_hover" => $this->get_setings_admin('css_id_or_class_hover')
-        ));
+    if (strpos($cachedPage, 'mobile') !== false) {
+        $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click_mobile');
+        $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover_mobile');
+        $my_css_code = $this->get_setings_admin('my_css_code_mobile');
+    } else {
+        $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click');
+        $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover');
+        $my_css_code = $this->get_setings_admin('my_css_code');
+    }
 
+    $jsonData = json_encode([
+        'id' => $this->get_setings_admin('id_opt'),
+        'site_url' => 'sht.nik',
+        'page_send_cov' => 'home_desctop',
+        'site_url_page' => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
+        'secret_key' => $this->get_setings_admin('secret_key'),
+        'css_id_or_class_click' => $css_id_or_class_click,
+        'css_id_or_class_hover' => $css_id_or_class_hover,
+    ]);
 
+    $opt_page_ajax_array = $this->page_control_api_array($opt_page_ajax_name);
 
-
-        ///api/homemobile
-        ///api/homedesctop
-        if ($this->page_control_api_url($this->page_control_api_array($opt_page_ajax_name))) {
-
-
-
-            $uri_api_post_page = $this->page_control_api_url($this->page_control_api_array($opt_page_ajax_name));
-
-
-        } else {
-
-            echo "ERROR send_data_server - api url";
-            exit;
-
-        }
-
-        $uri_api_post = $this->get_setings_admin('api_url').$uri_api_post_page;
-
-
-
-        echo '<br>uri_api_post ---- '.$uri_api_post;
-        echo '<br>site_url_page ---- '.$this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
-        
-
+    if ($uri_api_post_page = $this->page_control_api_url($opt_page_ajax_array)) {
+        $uri_api_post = $this->get_setings_admin('api_url') . $uri_api_post_page;
         $ch = curl_init($uri_api_post);
-
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Content-Length: ' . strlen($jsonData)
-        ));
-
+            'Content-Length: ' . strlen($jsonData),
+        ]);
 
         $response = curl_exec($ch);
-
+        curl_close($ch);
 
         if (curl_errno($ch)) {
             echo 'Помилка cURL: ' . curl_error($ch);
-        } else {
-
-            $link_coverage_css = plugins_url('/', dirname(__FILE__)) . 'coverage-css/';
-            $targetFolderPath = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
-            $dataArray = json_decode($response, true);
-          
-            $font_family = $this -> get_setings_admin('font_family');
-            $font_src = $this -> get_setings_admin('font_src');
-            $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("'. $font_src .'") format("'. end(explode('.', $font_src)) .'"); }';
-
-            $cssCode = $fonts;
-            // Отримуємо CSS код з асоціативного масиву
-            $cssCode .= $dataArray['message'];
-
-
-            $patterns = [
-                '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
-                '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-                '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
-                '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
-                '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{/',
-                '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
-                '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{/',
-                '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-                '/\(\s*overflow\s*:\s*clip\)\s*\{/',
-                '/\(\s*max-width\s*:\s*\d+\.\d+\s*px\s*\)\s*\{/'
-            ];
-
-
-            $cleaned_css = preg_replace($patterns, '', $cssCode);
-
-            
-            $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
-            $htmlContent = file_get_contents($cachedPageURL);
-            
-
-            $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $link_coverage_css . $opt_css_prod_name, $htmlContent);
-
-            $domain = parse_url(home_url(), PHP_URL_HOST);
-            $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
-            
-            $cleaned_css .=  $this -> get_setings_admin('my_css_code');
-            
-            $output_css = $cachedPageURL . $opt_css_prod_name;
-            file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css);
-
-            // Збережіть змінений HTML у rebuild-index-webp.html
-            $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
-
-            // rename file
-            rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
-
-            // create file new
-            file_put_contents($rebuildCachedPageFile, $htmlContent);
-
-            // Створіть та збережіть файл rebuild-index-webp.html.gz
-            $gzipContent = gzencode($htmlContent, 9);
-            $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-            file_put_contents($rebuildCachedPageGzFile, $gzipContent);
-            echo $dataArray['resultItem'];
-            //echo 'Відповідь від сервера: ' . $cleaned_css;
+            return;
         }
 
-        curl_close($ch);
+        $link_coverage_css = plugins_url('/', dirname(__FILE__)) . 'coverage-css/';
+        $targetFolderPath = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
+        $dataArray = json_decode($response, true);
+
+        $font_family = $this->get_setings_admin('font_family');
+        $font_src = $this->get_setings_admin('font_src');
+        $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("' . $font_src . '") format("' . end(explode('.', $font_src)) . '"); }';
+
+        $cssCode = $fonts . $dataArray['message'];
+
+        $patterns = [
+            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
+            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
+            '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
+            '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
+            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{/',
+            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
+            '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{/',
+            '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
+            '/\(\s*overflow\s*:\s*clip\)\s*\{/',
+            '/\(\s*max-width\s*:\s*\d+\.\d+\s*px\s*\)\s*\{/',
+        ];
+
+        $cleaned_css = preg_replace($patterns, '', $cssCode);
+
+        $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
+        $htmlContent = file_get_contents($cachedPageURL);
+
+        $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $link_coverage_css . $opt_css_prod_name, $htmlContent);
+
+        $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
+        $cleaned_css .= $my_css_code;
+        $output_css = $cachedPageURL . $opt_css_prod_name;
+        file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css);
+
+        $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
+        rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
+        file_put_contents($rebuildCachedPageFile, $htmlContent);
+
+        $gzipContent = gzencode($htmlContent, 9);
+        $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
+        file_put_contents($rebuildCachedPageGzFile, $gzipContent);
+
+        echo $dataArray['resultItem'];
+    } else {
+        echo "ERROR send_data_server - api url";
     }
+}
+
 
     public function return_select_ajax_css()
     {

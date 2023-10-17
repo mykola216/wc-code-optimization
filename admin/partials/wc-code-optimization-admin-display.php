@@ -181,64 +181,132 @@
                     <small>font_src</small>
                 </label>
             </p>
-            <p>
-                <?php $color_text = 'my_css_code'; ?>
-                <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
-                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       value=""
-                ><?php if (!empty($options[$color_text])) {
-                           echo $options[$color_text];
-                       } else {
-                           echo '';
-                       } ?></textarea>
-                <label for="url">
-                    <small>my_css_code</small>
-                </label>
-            </p>
-            <p>
-                <?php $color_text = 'css_id_or_class_click'; ?>
-                <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
-                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       value=""
-                ><?php if (!empty($options[$color_text])) {
-                           echo $options[$color_text];
-                       } else {
-                           echo '';
-                       } ?></textarea>
-                <label for="url">
-                    <small>css_id_or_class_click</small>
-                </label>
-            </p>
-            <p>
-                <?php $color_text = 'css_id_or_class_hover'; ?>
-                <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
-                       id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
-                       value=""
-                ><?php if (!empty($options[$color_text])) {
-                           echo $options[$color_text];
-                       } else {
-                           echo '';
-                       } ?></textarea>
-                <label for="url">
-                    <small>css_id_or_class_hover</small>
-                </label>
-            </p>
-            <p>
-                <?php $enable_disable_plugin = 'enable_disable_plugin'; ?>
-                <input type="checkbox" id="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
-                    name="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
-                    <?php if (!empty($options[$enable_disable_plugin])) {
-                        echo 'checked="checked"';
-                    } ?>
-                >
-                <label for="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]">
-                    <small>enable_disable_plugin</small>
-                </label>
-            </p>
-
+            <div class="tabs">
+                <div class="tab active">
+                    Desktop
+                </div>
+                <div class="tab">
+                    Mobile
+                </div>
+            </div>
+            <div class="show">
+                <p>
+                    <?php $color_text = 'my_css_code'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>my_css_code</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $color_text = 'css_id_or_class_click'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>css_id_or_class_click</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $color_text = 'css_id_or_class_hover'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>css_id_or_class_hover</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $enable_disable_plugin = 'enable_disable_plugin'; ?>
+                    <input type="checkbox" id="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                        <?php if (!empty($options[$enable_disable_plugin])) {
+                            echo 'checked="checked"';
+                        } ?>
+                    >
+                    <label for="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]">
+                        <small>enable_disable_plugin</small>
+                    </label>
+                </p>
+            </div>
+            <div class="hide">
+                <p>
+                    <?php $color_text = 'my_css_code_mobile'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>my_css_code_mobile</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $color_text = 'css_id_or_class_click_mobile'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>css_id_or_class_click_mobile</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $color_text = 'css_id_or_class_hover_mobile'; ?>
+                    <textarea type="text" style="width: 50%; min-height: 250px;" class="regular-text" size="100" tabindex="1" style="width: auto;"
+                        id="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $color_text; ?>]"
+                        value=""
+                    ><?php if (!empty($options[$color_text])) {
+                            echo $options[$color_text];
+                        } else {
+                            echo '';
+                        } ?></textarea>
+                    <label for="url">
+                        <small>css_id_or_class_hover_mobile</small>
+                    </label>
+                </p>
+                <p>
+                    <?php $enable_disable_plugin = 'enable_disable_plugin'; ?>
+                    <input type="checkbox" id="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                        name="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]"
+                        <?php if (!empty($options[$enable_disable_plugin])) {
+                            echo 'checked="checked"';
+                        } ?>
+                    >
+                    <label for="<?php echo $option_filds; ?>_option[<?php echo $enable_disable_plugin; ?>]">
+                        <small>enable_disable_plugin</small>
+                    </label>
+                </p>
+            </div>
         </div>
         <?php
         submit_button();
@@ -247,42 +315,67 @@
     <?php
 
 
-    function page_control_api_arrey_my ($page_name) {
-        $page_arrey = [
-            'index.html' => 'homedesctop',
-            'index-webp.html' => 'homedesctop',
+        function page_control_api_arrey_my ($page_name) {
+            $page_arrey = [
+                'index.html' => 'homedesctop',
+                'index-webp.html' => 'homedesctop',
 
-        ];
+            ];
 
-        return $page_arrey[''];
-    }
-    $cachedPageURL = ABSPATH;
-        //var_dump($cachedPageURL);
-    if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-        $url = "https://";
-    else
-        $url = "http://";
-    // Append the host(domain name, ip) to the URL.
-    $url.= $_SERVER['HTTP_HOST'];
+            return $page_arrey[''];
+        }
+        $cachedPageURL = ABSPATH;
+            //var_dump($cachedPageURL);
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            $url = "https://";
+        else
+            $url = "http://";
+        // Append the host(domain name, ip) to the URL.
+        $url.= $_SERVER['HTTP_HOST'];
 
-    // Append the requested resource location to the URL
-    //$url.= $_SERVER['REQUEST_URI'];
+        // Append the requested resource location to the URL
+        //$url.= $_SERVER['REQUEST_URI'];
 
-    //echo $url;
-    
-    $all_files = array();
-    $color_text = 'plugins_url';
-    if (!empty($options[$color_text])) {
+        //echo $url;
+        
+        $all_files = array();
+        $color_text = 'plugins_url';
+        if (!empty($options[$color_text])) {
         $plugins_url_cache = $options[$color_text];
         $cachedPageURL = ABSPATH . $plugins_url_cache;
         $mydir = $cachedPageURL;
-        $myfiles = array_diff(scandir($mydir), array('.', '..'));
-        foreach ($myfiles as $filename) {
-            echo '<p><div class="button button-primary wc-optimized-cached-file">'.$filename. '</div></p>';
-            $all_files[] = $filename;
-        }
-    }
+        $myitems = array_diff(scandir($mydir), array('.', '..'));
+
     ?>
+    <div class="show">
+    <?php
+        foreach ($myitems as $item) {
+            $itemPath = $mydir . DIRECTORY_SEPARATOR . $item;
+
+                if (is_file($itemPath) && strpos($item, 'mobile') === false) {
+                    echo '<p><div class="button button-primary wc-optimized-cached-file">' . $item . '</div></p>';
+                    $all_files[] = $item;
+                }
+            }
+        }
+
+        ?>
+    </div>
+    <div class="hide">
+        <?php
+        foreach ($myitems as $item) {
+            $itemPath = $mydir . DIRECTORY_SEPARATOR . $item;
+        
+            if (is_file($itemPath) && strpos($item, 'mobile') !== false) {
+                echo '<p><div class="button button-primary wc-optimized-cached-file">' . $item . '</div></p>';
+                $all_files[] = $item;
+            }
+        }
+        
+        
+
+        ?>
+    </div>
     <p>Select exclude css</p>
     <?php
     $file_select_css = null;

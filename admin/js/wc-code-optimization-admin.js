@@ -138,5 +138,18 @@
 		// 	});
 		// });
 
+		/// TABS
+		$(".tabs .tab").click(function () {
+			if (!$(this).hasClass("active")) {
+				// Знімаємо клас "active" з усіх табів
+				$(".tabs .tab").removeClass("active");
+				// Додаємо клас "active" до вибраного таба
+				$(this).addClass("active");
+
+				// Перемикаємо класи "show" і "hide" для відповідних блоків
+				$(".show, .hide").toggle();
+			}
+            
+		});
 	});
 })(jQuery);
