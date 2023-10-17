@@ -331,7 +331,7 @@ class Wc_Code_Optimization_Admin
 
     private function saveCombinedCSSToFile($combinedCSS, $combinedCSSFile)
     {
-        file_put_contents($combinedCSSFile, $combinedCSS, FILE_APPEND | LOCK_EX);
+        file_put_contents($combinedCSSFile, $combinedCSS);
     }
 
     private function removeStyleTags($htmlContent, $allowedStyles)
@@ -360,7 +360,7 @@ class Wc_Code_Optimization_Admin
     {
         $combinedCSSLink = '<link rel="stylesheet" type="text/css" href="' . $this->get_setings_admin('cache_url') . basename($combinedCSSFile) . '" async>';
         $htmlContent = str_replace('</head>', $combinedCSSLink . '</head>', $htmlContent);
-        file_put_contents($rebuildCachedPageFile, $htmlContent, FILE_APPEND | LOCK_EX);
+        file_put_contents($rebuildCachedPageFile, $htmlContent);
         isset($_POST['optimizedPage']) ? $this->send_data_server($_POST['optimizedPage'], $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name) : '';
     }
 
@@ -368,7 +368,7 @@ class Wc_Code_Optimization_Admin
     {
         $gzipContent = gzencode($htmlContent, 9); // 9 - максимальна стисненість
         $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-        file_put_contents($rebuildCachedPageGzFile, $gzipContent, FILE_APPEND | LOCK_EX);
+        file_put_contents($rebuildCachedPageGzFile, $gzipContent);
     }
 
 
@@ -482,7 +482,7 @@ class Wc_Code_Optimization_Admin
             $cleaned_css .=  $this -> get_setings_admin('my_css_code');
             
             $output_css = $cachedPageURL . $opt_css_prod_name;
-            file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css, FILE_APPEND | LOCK_EX);
+            file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css);
 
             // Збережіть змінений HTML у rebuild-index-webp.html
             $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
@@ -491,12 +491,12 @@ class Wc_Code_Optimization_Admin
             rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
 
             // create file new
-            file_put_contents($rebuildCachedPageFile, $htmlContent, FILE_APPEND | LOCK_EX);
+            file_put_contents($rebuildCachedPageFile, $htmlContent);
 
             // Створіть та збережіть файл rebuild-index-webp.html.gz
             $gzipContent = gzencode($htmlContent, 9);
             $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-            file_put_contents($rebuildCachedPageGzFile, $gzipContent, FILE_APPEND | LOCK_EX);
+            file_put_contents($rebuildCachedPageGzFile, $gzipContent);
             echo $dataArray['resultItem'];
             //echo 'Відповідь від сервера: ' . $cleaned_css;
         }
