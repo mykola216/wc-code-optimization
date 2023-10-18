@@ -483,27 +483,27 @@ class Wc_Code_Optimization_Admin
 
     }
 
-    public function clear_optimized_css() {
-        $directory = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
-    
-        // Рекурсивна функція для видалення вмісту директорій
-        function delete_directory_contents($path) {
-            if (is_dir($path)) {
-                $files = glob($path . '/*');
-                foreach ($files as $file) {
-                    if (is_file($file)) {
-                        unlink($file);
-                    } elseif (is_dir($file)) {
-                        delete_directory_contents($file);
-                        rmdir($file);
-                    }
+    // Рекурсивна функція для видалення вмісту директорій
+    private function delete_directory_contents($path) {
+        if (is_dir($path)) {
+            $files = glob($path . '/*');
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                } elseif (is_dir($file)) {
+                    delete_directory_contents($file);
+                    rmdir($file);
                 }
             }
         }
-    
+    }
+
+    public function clear_optimized_css() {
+        $directory_coverage_css = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
         // Виклик рекурсивної функції для видалення вмісту директорії
-        delete_directory_contents($directory);
-    
+        $this->delete_directory_contents($directory_coverage_css);
+        $directory_rebuilt_cached_page = dirname(plugin_dir_path(__FILE__)) . '/rebuilt-cached-page/';
+        $this->delete_directory_contents($directory_rebuilt_cached_page);
         echo '<h3 style="color: green;">Optimized css deleted</h3>';
     }
     
