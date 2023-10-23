@@ -46,7 +46,7 @@
 		// 	});
 		// });
 		let selectElement = $('#selected_exclude_css');
-		
+
 		//$('#generate-optimized-css-code').click(function () {
 		$('.wc-optimized-cached-file').click(function () {
 			let optimizedPage = $(this).text();
@@ -56,7 +56,7 @@
 			let cssUrl = selectedOption.map(e => $(e).attr('css_url'));
 
 
-            $(this).addClass('send_ajax_text action');
+			$(this).addClass('send_ajax_text action');
 
 			$.ajax({
 				url: ajaxurl,
@@ -72,7 +72,7 @@
 
 					$('#optimization-css').html(data);
 
-                    $('div.send_ajax_text').removeClass('action');
+					$('div.send_ajax_text').removeClass('action');
 
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
@@ -149,7 +149,32 @@
 				// Перемикаємо класи "show" і "hide" для відповідних блоків
 				$(".show, .hide").toggle();
 			}
-            
+
 		});
+		/*   JS Combine    */
+		$('.combine_js').click(function () {
+			let page = $(this).attr('page');
+			let fieldName = (page === 'mobile') ? 'selectedScriptsMobile[]' : 'selectedScriptsDesktop[]';
+			let selectedScripts = $('input[name="' + fieldName + '"]:checked').map(function () {
+				return $(this).val();
+			}).get();
+			$.ajax({
+				url: ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wc_combine_js_action',
+					selectedScripts: selectedScripts,
+					page: page
+				},
+				success: function (data) {
+					$('#optimization-css').html(data.slice(0, -1));
+				},
+				error: function () {
+					console.log('Error sending a request to the server');
+				}
+			});
+
+		})
+
 	});
 })(jQuery);

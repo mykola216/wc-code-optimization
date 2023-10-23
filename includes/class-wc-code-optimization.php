@@ -173,6 +173,7 @@ class Wc_Code_Optimization
         $options = get_option($option_filds . '_option');
         if(isset($options['enable_disable_plugin'])){
 			$this->loader->add_action( 'wp_ajax_wc_optimized_css_action', $plugin_admin, 'combineCSSOnHomepage');
+			$this->loader->add_action( 'wp_ajax_wc_combine_js_action', $plugin_admin, 'combine_external_scripts');
 		}else{
 			$this->loader->add_action( 'wp_ajax_wc_optimized_css_action', $plugin_admin, 'enable_disable_plugin');
 		}

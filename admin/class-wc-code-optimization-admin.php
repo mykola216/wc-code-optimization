@@ -252,17 +252,17 @@ class Wc_Code_Optimization_Admin
             echo "ERROR combineCSSOnHomepage - optimizedPage";
         }
 
-        $combined_css_page_name = 'combined-css-'.$api_page_name.'.css';
-        $rebuild_page_html_name = 'rebuild-index-'.$api_page_name.'.html';
-        $opt_css_prod_name = 'style-opt-prod-'.$api_page_name.'.css';
+        $combined_css_page_name = 'combined-css-' . $api_page_name . '.css';
+        $rebuild_page_html_name = 'rebuild-index-' . $api_page_name . '.html';
+        $opt_css_prod_name = 'style-opt-prod-' . $api_page_name . '.css';
 
-        echo '<br>$api_page_name             1111  '.$api_page_name;
-        echo '<br>$combined_css_page_name    2222  '.$combined_css_page_name;
-        echo '<br>$rebuild_page_html_name    3333  '.$rebuild_page_html_name;
-        echo '<br>$opt_css_prod_name         4444  '.$opt_css_prod_name;
+        echo '<br>$api_page_name             1111  ' . $api_page_name;
+        echo '<br>$combined_css_page_name    2222  ' . $combined_css_page_name;
+        echo '<br>$rebuild_page_html_name    3333  ' . $rebuild_page_html_name;
+        echo '<br>$opt_css_prod_name         4444  ' . $opt_css_prod_name;
 
 
-/*
+        /*
         if ($combined_css_page_name = '' && $rebuild_page_html_name = '' && $opt_css_prod_name = '') {
             echo "ERROR combineCSSOnHomepage - optimizedPage";
             exit;
@@ -380,98 +380,98 @@ class Wc_Code_Optimization_Admin
     }
 
     public function send_data_server($cachedPage, $combined_css_page_name, $rebuild_page_html_name, $opt_css_prod_name, $opt_page_ajax_name)
-{
-    $domain = parse_url(home_url(), PHP_URL_HOST);
+    {
+        $domain = parse_url(home_url(), PHP_URL_HOST);
 
-    if (strpos($cachedPage, 'mobile') !== false) {
-        $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click_mobile');
-        $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover_mobile');
-        $my_css_code = $this->get_setings_admin('my_css_code_mobile');
-    } else {
-        $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click');
-        $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover');
-        $my_css_code = $this->get_setings_admin('my_css_code');
-    }
-
-    $jsonData = json_encode([
-        'id' => $this->get_setings_admin('id_opt'),
-        'site_url' => 'sht.nik',
-        'page_send_cov' => 'home_desctop',
-        'site_url_page' => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
-        'secret_key' => $this->get_setings_admin('secret_key'),
-        'css_id_or_class_click' => $css_id_or_class_click,
-        'css_id_or_class_hover' => $css_id_or_class_hover,
-    ]);
-
-    $opt_page_ajax_array = $this->page_control_api_array($opt_page_ajax_name);
-
-    if ($uri_api_post_page = $this->page_control_api_url($opt_page_ajax_array)) {
-        $uri_api_post = $this->get_setings_admin('api_url') . $uri_api_post_page;
-        $ch = curl_init($uri_api_post);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($jsonData),
-        ]);
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        if (curl_errno($ch)) {
-            echo 'Помилка cURL: ' . curl_error($ch);
-            return;
+        if (strpos($cachedPage, 'mobile') !== false) {
+            $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click_mobile');
+            $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover_mobile');
+            $my_css_code = $this->get_setings_admin('my_css_code_mobile');
+        } else {
+            $css_id_or_class_click = $this->get_setings_admin('css_id_or_class_click');
+            $css_id_or_class_hover = $this->get_setings_admin('css_id_or_class_hover');
+            $my_css_code = $this->get_setings_admin('my_css_code');
         }
 
-        $link_coverage_css = plugins_url('/', dirname(__FILE__)) . 'coverage-css/';
-        $targetFolderPath = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
-        $dataArray = json_decode($response, true);
+        $jsonData = json_encode([
+            'id' => $this->get_setings_admin('id_opt'),
+            'site_url' => 'sht.nik',
+            'page_send_cov' => 'home_desctop',
+            'site_url_page' => $this->get_protocol_and_uri() . $this->get_setings_admin('cache_url') . $rebuild_page_html_name,
+            'secret_key' => $this->get_setings_admin('secret_key'),
+            'css_id_or_class_click' => $css_id_or_class_click,
+            'css_id_or_class_hover' => $css_id_or_class_hover,
+        ]);
 
-        $font_family = $this->get_setings_admin('font_family');
-        $font_src = $this->get_setings_admin('font_src');
-        $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("' . $font_src . '") format("' . end(explode('.', $font_src)) . '"); }';
+        $opt_page_ajax_array = $this->page_control_api_array($opt_page_ajax_name);
 
-        $cssCode = $fonts . $dataArray['message'];
+        if ($uri_api_post_page = $this->page_control_api_url($opt_page_ajax_array)) {
+            $uri_api_post = $this->get_setings_admin('api_url') . $uri_api_post_page;
+            $ch = curl_init($uri_api_post);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($jsonData),
+            ]);
 
-        $patterns = [
-            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
-            '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
-            '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{/',
-            '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{/',
-            '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
-            '/\(\s*overflow\s*:\s*clip\)\s*\{/',
-            '/\(\s*max-width\s*:\s*\d+\.\d+\s*px\s*\)\s*\{/',
-        ];
+            $response = curl_exec($ch);
+            curl_close($ch);
 
-        $cleaned_css = preg_replace($patterns, '', $cssCode);
+            if (curl_errno($ch)) {
+                echo 'Помилка cURL: ' . curl_error($ch);
+                return;
+            }
 
-        $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
-        $htmlContent = file_get_contents($cachedPageURL);
+            $link_coverage_css = plugins_url('/', dirname(__FILE__)) . 'coverage-css/';
+            $targetFolderPath = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
+            $dataArray = json_decode($response, true);
 
-        $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $link_coverage_css . $opt_css_prod_name, $htmlContent);
+            $font_family = $this->get_setings_admin('font_family');
+            $font_src = $this->get_setings_admin('font_src');
+            $fonts = '@font-face { font-weight: normal; font-style: normal; font-family: "' . $font_family . '"; src: url("' . $font_src . '") format("' . end(explode('.', $font_src)) . '"); }';
 
-        $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
-        $cleaned_css .= $my_css_code;
-        $output_css = $cachedPageURL . $opt_css_prod_name;
-        file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css);
+            $cssCode = $fonts . $dataArray['message'];
 
-        $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
-        rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
-        file_put_contents($rebuildCachedPageFile, $htmlContent);
+            $patterns = [
+                '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
+                '/\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
+                '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{\s*/',
+                '/\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*and\s*\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
+                '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*{/',
+                '/\\(\s*min-width\s*:\s*\d+\s*px\s*\)\s*/',
+                '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*{/',
+                '/\\(\s*max-width\s*:\s*\d+\s*px\s*\)\s*/',
+                '/\(\s*overflow\s*:\s*clip\)\s*\{/',
+                '/\(\s*max-width\s*:\s*\d+\.\d+\s*px\s*\)\s*\{/',
+            ];
 
-        $gzipContent = gzencode($htmlContent, 9);
-        $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
-        file_put_contents($rebuildCachedPageGzFile, $gzipContent);
+            $cleaned_css = preg_replace($patterns, '', $cssCode);
 
-        echo $dataArray['resultItem'];
-    } else {
-        echo "ERROR send_data_server - api url";
+            $cachedPageURL = ABSPATH . $this->get_setings_admin('cache_url') . $rebuild_page_html_name;
+            $htmlContent = file_get_contents($cachedPageURL);
+
+            $htmlContent = str_replace($this->get_setings_admin('cache_url') . $combined_css_page_name, $link_coverage_css . $opt_css_prod_name, $htmlContent);
+
+            $cachedPageURL = ABSPATH . $this->get_setings_admin('plugins_url');
+            $cleaned_css .= $my_css_code;
+            $output_css = $cachedPageURL . $opt_css_prod_name;
+            file_put_contents($targetFolderPath . $opt_css_prod_name, $cleaned_css);
+
+            $rebuildCachedPageFile = $cachedPageURL . $cachedPage;
+            rename($rebuildCachedPageFile, $cachedPageURL . 'old_' . $cachedPage);
+            file_put_contents($rebuildCachedPageFile, $htmlContent);
+
+            $gzipContent = gzencode($htmlContent, 9);
+            $rebuildCachedPageGzFile = $rebuildCachedPageFile . '.gz';
+            file_put_contents($rebuildCachedPageGzFile, $gzipContent);
+
+            echo $dataArray['resultItem'];
+        } else {
+            echo "ERROR send_data_server - api url";
+        }
     }
-}
 
 
     public function return_select_ajax_css()
@@ -479,12 +479,11 @@ class Wc_Code_Optimization_Admin
 
 
         echo '<select>';
-
-
     }
 
     // Рекурсивна функція для видалення вмісту директорій
-    private function delete_directory_contents($path) {
+    private function delete_directory_contents($path)
+    {
         if (is_dir($path)) {
             $files = glob($path . '/*');
             foreach ($files as $file) {
@@ -498,7 +497,8 @@ class Wc_Code_Optimization_Admin
         }
     }
 
-    public function clear_optimized_css() {
+    public function clear_optimized_css()
+    {
         $directory_coverage_css = dirname(plugin_dir_path(__FILE__)) . '/coverage-css/';
         // Виклик рекурсивної функції для видалення вмісту директорії
         $this->delete_directory_contents($directory_coverage_css);
@@ -506,12 +506,84 @@ class Wc_Code_Optimization_Admin
         $this->delete_directory_contents($directory_rebuilt_cached_page);
         echo '<h3 style="color: green;">Optimized css deleted</h3>';
     }
-    
-    
-    
-    public function enable_disable_plugin(){
+
+
+
+    public function enable_disable_plugin()
+    {
         echo '<h3 style="color: red;">The plugin is disabled</h3><br>';
     }
+
+
+    public function combine_external_scripts()
+    {
+        if (isset($_POST['selectedScripts'])) {
+            $selectedScripts = $_POST['selectedScripts'];
+            $folderPath = ABSPATH . $this->get_setings_admin('plugins_url');
+
+            // 1. Об'єднати вибрані скрипти в один файл
+            $combinedScript = '';
+            foreach ($selectedScripts as $scriptURL) {
+                $combinedScript .= file_get_contents($scriptURL);
+            }
+
+            // 2. Зберегти об'єднані скрипти в папці плагіна
+            $pluginPath = plugin_dir_path(__FILE__);
+            $externalScriptsPath = $pluginPath . 'external-scripts/';
+            if (!is_dir($externalScriptsPath)) {
+                // Створення папки external-scripts, якщо вона не існує
+                mkdir($externalScriptsPath);
+            }
+            $combinedFilePath = $externalScriptsPath . 'combined_scripts.js';
+            file_put_contents($combinedFilePath, $combinedScript);
+
+            if ($_POST['page'] === 'mobile') {
+                // 3. Видалити поодинокі підключення цих скриптів з файлів
+                $mobileFiles = glob($folderPath . '/*mobile*.html');
+                if (!empty($mobileFiles)) {
+                    foreach ($mobileFiles as $file) {
+                        $fileContent = file_get_contents($file);
+                        foreach ($selectedScripts as $scriptURL) {
+                            // Заміна тегів <script> з атрибутами src на порожній рядок
+                            $pattern = '/<script\s+[^>]*src=["\']' . preg_quote($scriptURL, '/') . '["\'][^>]*><\/script>/i';
+                            $fileContent = preg_replace($pattern, '', $fileContent);
+                        }
+                        // 4. Підключити об'єднаний файл
+                        $combinedScriptURL = plugins_url('external-scripts/combined_scripts.js', __FILE__);
+                        $fileContent = str_replace('</head>', '<script src="' . $combinedScriptURL . '"></script></head>', $fileContent);
+                        file_put_contents($file, $fileContent);
+                    }
+                } else {
+                    echo "No mobile files found.";
+                }
+            } else {
+                // 3. Видалити поодинокі підключення цих скриптів з файлів
+                $desktopFiles = glob($folderPath . '/*index*.html');
+                if (!empty($desktopFiles)) {
+                    foreach ($desktopFiles as $file) {
+                        if (strpos($file, 'mobile') === false) {
+                            $fileContent = file_get_contents($file);
+                            foreach ($selectedScripts as $scriptURL) {
+                                // Заміна тегів <script> з атрибутами src на порожній рядок
+                                $pattern = '/<script\s+[^>]*src=["\']' . preg_quote($scriptURL, '/') . '["\'][^>]*><\/script>/i';
+                                $fileContent = preg_replace($pattern, '', $fileContent);
+                            }
+                            // 4. Підключити об'єднаний файл
+                            $combinedScriptURL = plugins_url('external-scripts/combined_scripts.js', __FILE__);
+                            $fileContent = str_replace('</head>', '<script src="' . $combinedScriptURL . '"></script></head>', $fileContent);
+                            file_put_contents($file, $fileContent);
+                        }
+                    }
+                } else {
+                    echo "No desktop files found.";
+                }
+            }
+
+            var_dump($selectedScripts);
+        }
+    }
+
+
 
     private function remove_file_dir($url_dim)
     {

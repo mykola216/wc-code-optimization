@@ -332,7 +332,7 @@
             $url = "http://";
         // Append the host(domain name, ip) to the URL.
         $url.= $_SERVER['HTTP_HOST'];
-
+        
         // Append the requested resource location to the URL
         //$url.= $_SERVER['REQUEST_URI'];
 
@@ -388,7 +388,7 @@
         end($file_array) === 'html' ? $file_select_css = $file : $file_select_css;
     }
     $domain = parse_url(home_url(), PHP_URL_HOST);
-    $cachedPageURL = ABSPATH . $options['plugins_url'] . '/' . $file_select_css;
+    $cachedPageURL = ABSPATH . $options['plugins_url'] . $file_select_css;
     $htmlContent = file_get_contents($cachedPageURL);
     preg_match_all('/<link[^>]*href=[\'"]([^\'"]+\.css[^\'"]*)[\'"][^>]*>/i', $htmlContent, $cssLinks);
     $selected_css = get_option('selected_css');
@@ -404,8 +404,70 @@
         ?>
     </select>
     <br>
+    <br>
+    <br>
+    <br>
+    <div class="external_scripts show" page="desktop">
+        <?php 
+        // Регулярний вираз для знаходження всіх скриптів
+        $regex = '/<script[^>]+src=["\']((?!(?:' . preg_quote($url, '/') . ')).+?)["\'][^>]*>/i';
+        
+        // Знайдемо всі входження в регулярному виразі
+        if (preg_match_all($regex, $htmlContent, $matches)) {
+            // $matches[1] містить URL-адреси скриптів
+            $scriptURLs = $matches[1];
 
-    
+            // Виведемо ті скрипти, у яких в src відсутній ваш домен разом із чекбоксами
+            foreach ($scriptURLs as $scriptURL) {
+                echo '<label style="font-size: 20px;">';
+                echo '<input type="checkbox" name="selectedScriptsDesktop[]" value="' . $scriptURL . '">';
+                echo $scriptURL;
+                echo '</label>';
+                echo "<br>";
+                echo "<br>";
+            }
+            echo '<p><div class="button button-primary combine_js" page="desktop" style="background-color: lightgreen; color: #000;">Combine js codes</div></p>';
+        }else{
+            echo '<h3 style="color: maroon;">No external js scripts</h3>';
+        } 
+        ?>
+    </div>
+    <div class="external_scripts hide" page="mobile">
+        <?php 
+        foreach ($all_files as $file) {
+           // Перевірка, чи в файлі присутнє слово "mobile"
+            if (strpos($file, 'mobile') !== false) {
+                // Перевірка, чи ім'я файлу закінчується на ".html"
+                if (pathinfo($file, PATHINFO_EXTENSION) === 'html') {
+                    $mobile_cache = $file;
+                }
+            }
+        }
+        $cachedPageURLMobile = ABSPATH . $options['plugins_url'] . $mobile_cache;
+        $htmlContentMobile = file_get_contents($cachedPageURLMobile);
+        // Регулярний вираз для знаходження всіх скриптів
+        $regex = '/<script[^>]+src=["\']((?!(?:' . preg_quote($url, '/') . ')).+?)["\'][^>]*>/i';
+        
+        // Знайдемо всі входження в регулярному виразі
+        if (preg_match_all($regex, $htmlContentMobile, $matches)) {
+            // $matches[1] містить URL-адреси скриптів
+            $scriptURLs = $matches[1];
+
+            // Виведемо ті скрипти, у яких в src відсутній ваш домен разом із чекбоксами
+            foreach ($scriptURLs as $scriptURL) {
+                echo '<label style="font-size: 20px;">';
+                echo '<input type="checkbox" name="selectedScriptsMobile[]" value="' . $scriptURL . '">';
+                echo $scriptURL;
+                echo '</label>';
+                echo "<br>";
+                echo "<br>";
+            }
+            echo '<p><div class="button button-primary combine_js" page="mobile" style="background-color: lightgreen; color: #000;">Combine js codes</div></p>';
+        }else{
+            echo '<h3 style="color: maroon;">No external js scripts</h3>';
+        } 
+        ?>
+    </div>
     <br>
     <p><div class="button button-primary" id="clear_optimized_css" style="background-color: red;">Clear optimized css</div></p>
     <!-- This file should primarily consist of HTML with a little bit of PHP. -->
